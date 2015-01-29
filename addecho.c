@@ -15,11 +15,9 @@ int main(int argc, char ** argv) {
 			switch (opt) {
 			case 'd':
 				delay = strtol(optarg, NULL, 10);
-				printf("delay: %d\n", delay);
 				break;
 			case 'v':
 				volume_scale = strtol(optarg, NULL, 10);
-				printf("volume_scale: %d\n", volume_scale);
 				break;
 			default:
 				fprintf(stderr, "Usage: %s [-d delay] [-v volume_scale] sourvewav destwav\n", argv[0]);
@@ -76,30 +74,28 @@ int main(int argc, char ** argv) {
 				current = current + delay * 2;
 			} else {
 				bytes = fread(orig, sizeof(short), ((size - current) / 2), input);
-				fread(echo, sizeof(short), ((size - current) / 2), input2);
+				fread(echo, sizeof(short), bytes, input2);
 				for (i = 0; i < ((size - current) / 2); i++) {
 					echo[i] = echo[i] / volume_scale;
 					echo[i] = echo[i] + orig[i];
 				}
-				fwrite(echo, sizeof(short), ((size - current) / 2), output);
+				fwrite(echo, sizeof(short), bytes, output);
 				fread(orig, 1, 1, input);
 			}
 		}
 		int zero_samples = delay - ((size - 44) / 2);
-		int non_header_samples = ((size - 44) / 2);
-		printf("non_header_samples = %d\n", non_header_samples);
-		printf("zero_samples = %d\n", zero_samples);
+		printf("zero_samples: %d\n", zero_samples);
 		if (zero_samples > 0) {
 			for (i = 0; i < zero_samples; i++) {
 				short zero = 0;
 				fwrite(&zero, sizeof(short), 1, output);
 			}
 		}
-		fread(echo, sizeof(short), delay, input2);
+		bytes = fread(echo, sizeof(short), delay, input2);
 		for (i = 0; i < delay; i++) {
 			echo[i] = echo[i] / volume_scale;
 		}
-		fwrite(echo, sizeof(short), delay, output);
+		fwrite(echo, sizeof(short), bytes, output);
 		fclose(input);
 		fclose(input2);
 		fclose(output);
