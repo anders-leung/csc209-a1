@@ -3,27 +3,26 @@
 #include <unistd.h>
 
 int main(int argc, char ** argv) {
+	int opt = 0;
 	int delay = 8000;
 	int volume_scale = 4;
 	int source_index = 1;
 	int dest_index = 2;
 	FILE *input, *input2, *output;
-	
+
 	if (argc == 3 || argc == 5 || argc == 7) {
-		int opt;
-		while ((opt = getopt(argc, argv, "d:v:")) != -1) {
-			printf("opt = %d\n", opt);
+		while ((opt = getopt(argc, argv, "d:v:")) > -1) {
 			switch (opt) {
 			case 'd':
-				delay = atoi(optarg);
+				delay = strtol(optarg, NULL, 10);
+				printf("delay: %d\n", delay);
 				break;
 			case 'v':
-				volume_scale = atoi(optarg);
+				volume_scale = strtol(optarg, NULL, 10);
+				printf("volume_scale: %d\n", volume_scale);
 				break;
 			default:
-				fprintf(stderr, "Usage: %s [-d delay] \
-					[-v volume_scale] sourvewav \
-					destwav\n", argv[0]);
+				fprintf(stderr, "Usage: %s [-d delay] [-v volume_scale] sourvewav destwav\n", argv[0]);
 				exit(1);
 			}
 		}
@@ -31,7 +30,15 @@ int main(int argc, char ** argv) {
 			fprintf(stderr, "Expected argument after options\n");
 			exit(1);
 		}
-		printf("i got past the cases");
+		if (argc == 5) {
+			source_index = 3;
+			dest_index = 4;
+		}
+		if (argc == 7) {
+			source_index = 5;
+			dest_index = 6;
+		}
+	
 		input = fopen(argv[source_index], "r");
 		fseek(input, 0, SEEK_END);
 		long size = ftell(input);
