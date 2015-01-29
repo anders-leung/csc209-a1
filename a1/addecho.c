@@ -84,7 +84,6 @@ int main(int argc, char ** argv) {
 			}
 		}
 		int zero_samples = delay - ((size - 44) / 2);
-		printf("zero_samples: %d\n", zero_samples);
 		if (zero_samples > 0) {
 			for (i = 0; i < zero_samples; i++) {
 				short zero = 0;
